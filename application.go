@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"os/signal"
+	"runtime"
 	"sync"
 )
 
@@ -50,6 +51,9 @@ func (a *application) Stop() {
 }
 
 func (a *application) Background() {
+	// force GC so that everything is cleared
+	defer runtime.GC()
+
 	a.wg.Add(1)
 
 	signalCh := make(chan os.Signal, 1)

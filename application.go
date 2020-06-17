@@ -28,13 +28,17 @@ type application struct {
 }
 
 // NewApplication create a new application that can run in background
-func NewApplication() IApplication {
+func NewApplication(ctx context.Context) IApplication {
 
 	app := &application{
 		wg: &sync.WaitGroup{},
 	}
 
-	app.ctx, app.cancel = context.WithCancel(context.Background())
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	app.ctx, app.cancel = context.WithCancel(ctx)
 	return app
 }
 

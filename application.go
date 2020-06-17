@@ -8,6 +8,9 @@ import (
 	"sync"
 )
 
+// waitGroupContextKey contextKey for wait group
+const waitGroupContextKey = contextKey("APP:WAIT_GROUP")
+
 // IApplication interface
 type IApplication interface {
 
@@ -19,6 +22,22 @@ type IApplication interface {
 
 	// Stop the application
 	Stop()
+}
+
+// WaitGroupFromContext get a sync.WaitGroup from context, if available
+func WaitGroupFromContext(ctx context.Context) *sync.WaitGroup {
+	value := ctx.Value(waitGroupContextKey)
+	if value == nil {
+		return nil
+	}
+
+	switch wg := value.(type) {
+	case *sync.WaitGroup:
+		return wg
+
+	default:
+		return nil
+	}
 }
 
 type application struct {
@@ -38,7 +57,9 @@ func NewApplication(ctx context.Context) IApplication {
 		ctx = context.Background()
 	}
 
-	app.ctx, app.cancel = context.WithCancel(ctx)
+	app.ctx, app.cancel = context.WithCancel(
+		context.WithValue(ctx, waitGroupContextKey, app.wg),
+	)
 	return app
 }
 

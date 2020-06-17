@@ -27,3 +27,27 @@ func TestContextKeyToString(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+type simple struct {
+	val int
+}
+
+func TestContextWithPointer(t *testing.T) {
+	key := NewContextKey("hello")
+	ptr := &simple{val: 1}
+
+	ctx := context.WithValue(context.Background(), key, ptr)
+	ptr.val = 2
+
+	val := ctx.Value(key)
+	pval := val.(*simple)
+	if pval.val != 2 {
+		t.FailNow()
+	}
+	pval.val = 10
+
+	if ptr.val != 10 {
+		t.FailNow()
+	}
+
+}

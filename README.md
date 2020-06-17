@@ -30,7 +30,7 @@ func run2(ctx context.Context) {
 
 
 func main() {
-app := application.NewApplication()
+app := application.NewApplication(nil)
 app.Start(run1)  // start a goroutine for run1
 app.Start(run2)  // start a goroutine for run2
 app.Background()  // wait until ctrl-c is pressed

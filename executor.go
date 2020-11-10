@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"time"
 )
 
 // ICallable callable
@@ -35,6 +36,12 @@ func (e *executor) Submit(ctx context.Context, callable ICallable, data interfac
 		ctx:      ctx,
 		data:     data,
 	}
+}
+
+func (e *executor) ExecuteLater(ctx context.Context, callable ICallable, data interface{}, delay time.Duration) {
+	time.AfterFunc(delay, func() {
+		e.Submit(ctx, callable, data)
+	})
 }
 
 func NewExecutor(ctx context.Context, executorCount int) IExecutor {

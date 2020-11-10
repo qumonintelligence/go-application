@@ -36,3 +36,24 @@ app.Start(run2)  // start a goroutine for run2
 app.Background()  // wait until ctrl-c is pressed
 }
 ```
+
+# Executor
+
+```
+
+func afunc(ctx context.Context, data interface{}) {
+	// the function to be called later
+}
+```
+
+
+```
+// start 10 goroutines to execute the given func
+executor := application.NewExecutor(context.Background(), 10)
+
+// submit afunc to be call later after a second
+executor.ExecuteLater(ctx, afunc, nil, time.Second)
+
+// submit afunc to be called by the 10 goroutine
+executor.Submit(ctx, afunc, nil)
+```

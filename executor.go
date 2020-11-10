@@ -19,6 +19,9 @@ type IExecutor interface {
 	// Submit a callable to be called later
 	Submit(ctx context.Context, callable ICallable, data interface{})
 
+	// Execute a function later using the goroutine pool defined
+	ExecuteLater(ctx context.Context, callable ICallable, data interface{})
+
 	// Shutdown the executors
 	Shutdown()
 }

@@ -37,6 +37,17 @@ app.Background()  // wait until ctrl-c is pressed
 }
 ```
 
+
+```
+func main() {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Hour)
+	defer cancel()
+	app := application.NewApplication(ctx)
+	app.Start(run1)  // start a goroutine for run1
+	app.Start(run2)  // start a goroutine for run2
+	app.Wait() // wait until run1 & run2 completed, or after 1 hr
+```
+
 # Executor
 
 ```

@@ -22,6 +22,9 @@ type IApplication interface {
 
 	// Stop the application
 	Stop()
+
+	// Run and wait all runnable stopped
+	Wait()
 }
 
 // WaitGroupFromContext get a sync.WaitGroup from context, if available
@@ -73,6 +76,27 @@ func (a *application) Start(runnable Runnable) {
 
 func (a *application) Stop() {
 	a.cancel()
+}
+
+func (a *application) Wait() {
+	defer runtime.GC()
+
+	done := make(chan bool, 1)
+
+	go func() {
+		a.wg.Wait()
+		done <- true
+	}()
+
+	for {
+		select {
+		case <-done:
+			break
+
+		case <-a.ctx.Done():
+			break
+		}
+	}
 }
 
 func (a *application) Background() {

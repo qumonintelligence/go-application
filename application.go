@@ -88,14 +88,12 @@ func (a *application) Wait() {
 		done <- true
 	}()
 
-	for {
-		select {
-		case <-done:
-			break
+	select {
+	case <-done:
+		break
 
-		case <-a.ctx.Done():
-			break
-		}
+	case <-a.ctx.Done():
+		break
 	}
 }
 

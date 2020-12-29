@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.uber.org/atomic"
@@ -81,24 +82,33 @@ func (e *executor) Shutdown() {
 	e.cancel()
 }
 
+func (e *executor) execute() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+			go e.execute()
+		}
+	}()
+
+	for {
+		select {
+		case t := <-e.queue:
+			e.submitCount.Dec()
+			t.callable(t.ctx, t.data)
+
+		case <-e.ctx.Done():
+			e.cancel()
+			return
+		}
+	}
+}
+
 func (e *executor) start() {
 	if e.count <= 0 {
 		e.count = 1
 	}
 
 	for i := 0; i < e.count; i++ {
-		go func(i int) {
-			for {
-				select {
-				case t := <-e.queue:
-					e.submitCount.Dec()
-					t.callable(t.ctx, t.data)
-
-				case <-e.ctx.Done():
-					e.cancel()
-					return
-				}
-			}
-		}(i)
+		go e.execute()
 	}
 }

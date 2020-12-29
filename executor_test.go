@@ -10,6 +10,7 @@ import (
 
 func sleep5s(ctx context.Context, data interface{}) {
 	time.Sleep(time.Second)
+	panic("err")
 }
 
 func TestExecutor10(t *testing.T) {
